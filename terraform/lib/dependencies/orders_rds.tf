@@ -5,29 +5,33 @@ module "orders_rds" {
   name           = "${var.environment_name}-orders"
   engine         = "aurora-postgresql"
   engine_version = "15.10"
-  instance_class = "db.t3.medium"
 
   instances = {
-    one = {}
+    one = {
+      instance_class = "db.t3.medium"
+    }
   }
 
   vpc_id  = var.vpc_id
   subnets = var.subnet_ids
 
-  master_password        = random_string.orders_db_master.result
-  create_random_password = false
-  database_name          = "orders"
-  storage_encrypted      = true
-  apply_immediately      = true
-  skip_final_snapshot    = true
+  manage_master_user_password = false
+  master_password_wo          = random_string.orders_db_master.result
+  master_password_wo_version  = 1
+  database_name               = "orders"
+  storage_encrypted           = true
+  apply_immediately           = true
+  skip_final_snapshot         = true
 
-  create_db_parameter_group = true
-  db_parameter_group_name   = "${var.environment_name}-orders"
-  db_parameter_group_family = "aurora-postgresql15"
+  db_parameter_group = {
+    name   = "${var.environment_name}-orders"
+    family = "aurora-postgresql15"
+  }
 
-  create_db_cluster_parameter_group = true
-  db_cluster_parameter_group_name   = "${var.environment_name}-orders"
-  db_cluster_parameter_group_family = "aurora-postgresql15"
+  cluster_parameter_group = {
+    name   = "${var.environment_name}-orders"
+    family = "aurora-postgresql15"
+  }
 
   tags = var.tags
 }

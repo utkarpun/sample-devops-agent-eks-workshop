@@ -84,16 +84,16 @@ module "eks_cluster" {
     kubernetes = kubernetes.cluster
   }
 
-  cluster_name                   = var.environment_name
-  cluster_version                = var.cluster_version
-  cluster_endpoint_public_access = true
+  name                   = var.environment_name
+  kubernetes_version     = var.cluster_version
+  endpoint_public_access = true
 
   # Use custom cluster role with Auto Mode policies
   create_iam_role = false
   iam_role_arn    = aws_iam_role.eks_auto_cluster.arn
 
   # Enable all control plane logging including controller and scheduler
-  cluster_enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
+  enabled_log_types = ["api", "audit", "authenticator", "controllerManager", "scheduler"]
 
   # Tags for CloudWatch log group
   cloudwatch_log_group_tags = var.tags
@@ -106,18 +106,15 @@ module "eks_cluster" {
   access_entries = {}
 
   # EKS Auto Mode configuration
-  cluster_compute_config = {
+  compute_config = {
     enabled       = true
     node_pools    = ["general-purpose", "system"]
     node_role_arn = aws_iam_role.eks_auto_node.arn
   }
 
-  # Disable self-managed addons for Auto Mode
-  bootstrap_self_managed_addons = false
-
   # Auto Mode handles these - only keep metrics-server addon
   # CloudWatch observability addon is added separately to avoid circular dependency
-  cluster_addons = {
+  addons = {
     metrics-server = {
       most_recent = true
     }

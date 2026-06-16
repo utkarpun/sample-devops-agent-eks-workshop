@@ -18,6 +18,11 @@ output "eks_oidc_issuer_url" {
   value       = module.eks_cluster.cluster_oidc_issuer_url
 }
 
+output "eks_oidc_provider_arn" {
+  description = "EKS cluster OIDC provider ARN"
+  value       = module.eks_cluster.oidc_provider_arn
+}
+
 output "node_security_group_id" {
   description = "ID of the cluster primary security group (Auto Mode uses cluster SG)"
   value       = module.eks_cluster.cluster_primary_security_group_id
