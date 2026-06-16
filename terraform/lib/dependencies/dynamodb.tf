@@ -1,6 +1,6 @@
 module "dynamodb_carts" {
   source  = "terraform-aws-modules/dynamodb-table/aws"
-  version = "3.3.0"
+  version = "~> 4.0"
 
   name     = "${var.environment_name}-carts"
   hash_key = "id"

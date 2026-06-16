@@ -78,7 +78,7 @@ resource "aws_iam_role_policy_attachment" "eks_auto_networking_policy" {
 
 module "eks_cluster" {
   source  = "terraform-aws-modules/eks/aws"
-  version = "~> 20.31"
+  version = "~> 21.0"
 
   providers = {
     kubernetes = kubernetes.cluster

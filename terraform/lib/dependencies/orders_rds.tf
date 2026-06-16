@@ -1,6 +1,6 @@
 module "orders_rds" {
   source  = "terraform-aws-modules/rds-aurora/aws"
-  version = "7.7.1"
+  version = "~> 10.0"
 
   name           = "${var.environment_name}-orders"
   engine         = "aurora-postgresql"
@@ -13,10 +13,6 @@ module "orders_rds" {
 
   vpc_id  = var.vpc_id
   subnets = var.subnet_ids
-
-  # Allow access from both security groups and VPC CIDR (for EKS Auto Mode compatibility)
-  allowed_security_groups = concat(var.allowed_security_group_ids, [var.orders_security_group_id])
-  allowed_cidr_blocks     = [var.vpc_cidr]
 
   master_password        = random_string.orders_db_master.result
   create_random_password = false
@@ -34,6 +30,24 @@ module "orders_rds" {
   db_cluster_parameter_group_family = "aurora-postgresql15"
 
   tags = var.tags
+}
+
+resource "aws_vpc_security_group_ingress_rule" "orders_rds_sg" {
+  count = length(concat(var.allowed_security_group_ids, [var.orders_security_group_id]))
+
+  security_group_id            = module.orders_rds.security_group_id
+  from_port                    = module.orders_rds.cluster_port
+  to_port                      = module.orders_rds.cluster_port
+  ip_protocol                  = "tcp"
+  referenced_security_group_id = concat(var.allowed_security_group_ids, [var.orders_security_group_id])[count.index]
+}
+
+resource "aws_vpc_security_group_ingress_rule" "orders_rds_cidr" {
+  security_group_id = module.orders_rds.security_group_id
+  from_port         = module.orders_rds.cluster_port
+  to_port           = module.orders_rds.cluster_port
+  ip_protocol       = "tcp"
+  cidr_ipv4         = var.vpc_cidr
 }
 
 resource "random_string" "orders_db_master" {

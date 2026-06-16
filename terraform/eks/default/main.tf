@@ -32,7 +32,7 @@ resource "aws_s3_bucket_policy" "alb_logs" {
       {
         Effect = "Allow"
         Principal = {
-          AWS = "arn:aws:iam::${data.aws_elb_service_account.main.id}:root"
+          Service = "logdelivery.elasticloadbalancing.amazonaws.com"
         }
         Action   = "s3:PutObject"
         Resource = "${aws_s3_bucket.alb_logs.arn}/*"
@@ -62,7 +62,6 @@ resource "aws_s3_bucket_policy" "alb_logs" {
   })
 }
 
-data "aws_elb_service_account" "main" {}
 
 module "vpc" {
   source = "../../lib/vpc"

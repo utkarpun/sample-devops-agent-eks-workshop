@@ -114,21 +114,21 @@ output "mq_user" {
 }
 
 output "checkout_elasticache_arn" {
-  value       = module.checkout_elasticache_redis.arn
+  value       = aws_elasticache_replication_group.checkout.arn
   description = "Checkout Redis ElastiCache ARN."
 }
 
 output "checkout_elasticache_primary_endpoint" {
-  value       = module.checkout_elasticache_redis.endpoint
+  value       = aws_elasticache_replication_group.checkout.primary_endpoint_address
   description = "Checkout Redis hostname"
 }
 
 output "checkout_elasticache_reader_endpoint" {
-  value       = module.checkout_elasticache_redis.reader_endpoint_address
+  value       = aws_elasticache_replication_group.checkout.reader_endpoint_address
   description = "Checkout Redis reader hostname"
 }
 
 output "checkout_elasticache_port" {
-  value       = module.checkout_elasticache_redis.port
+  value       = 6379
   description = "Checkout Redis port"
 }
