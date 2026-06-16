@@ -13,8 +13,9 @@ module "catalog_rds" {
     }
   }
 
-  vpc_id  = var.vpc_id
-  subnets = var.subnet_ids
+  vpc_id                 = var.vpc_id
+  subnets                = var.subnet_ids
+  create_db_subnet_group = true
 
   manage_master_user_password = false
   master_password_wo          = random_string.catalog_db_master.result
