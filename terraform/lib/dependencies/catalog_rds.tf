@@ -18,6 +18,7 @@ module "catalog_rds" {
   create_db_subnet_group = true
 
   manage_master_user_password = false
+  master_username             = "admin"
   master_password_wo          = random_string.catalog_db_master.result
   master_password_wo_version  = 1
   database_name               = "catalog"
