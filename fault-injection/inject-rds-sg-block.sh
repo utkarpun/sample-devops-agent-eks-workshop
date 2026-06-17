@@ -14,7 +14,7 @@ echo ""
 
 # Auto-discover EKS security group
 echo "[1/4] Discovering EKS cluster security group..."
-EKS_CLUSTER=$(AWS_PAGER="" aws eks list-clusters --region $REGION --query "clusters[0]" --output text 2>/dev/null)
+EKS_CLUSTER="${EKS_CLUSTER:-$(AWS_PAGER="" aws eks list-clusters --region $REGION --query "clusters[0]" --output text 2>/dev/null)}"
 
 if [ -z "$EKS_CLUSTER" ] || [ "$EKS_CLUSTER" == "None" ]; then
   echo "ERROR: No EKS cluster found in region $REGION"
