@@ -107,7 +107,8 @@ try:
     # Step 1b: Apply NodeClass network policy (CRD is ready after terraform)
     print("Applying NodeClass network policy configuration...")
     subprocess.run(['aws', 'eks', 'update-kubeconfig', '--name', 'retail-store',
-                    '--region', REGION, '--kubeconfig', '/tmp/devops.kubeconfig'], check=True)
+                    '--region', REGION, '--kubeconfig', '/tmp/devops.kubeconfig',
+                    '--alias', 'retail-store'], check=True)
     nodeclass_yaml = "apiVersion: eks.amazonaws.com/v1\nkind: NodeClass\nmetadata:\n  name: default\nspec:\n  networkPolicy: DefaultAllow\n  networkPolicyEventLogs: Enabled\n"
     for attempt in range(1, 31):
         result = subprocess.run(
