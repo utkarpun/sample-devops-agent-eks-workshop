@@ -214,17 +214,31 @@ resource "null_resource" "nodeclass_network_policy" {
   provisioner "local-exec" {
     command = <<-EOT
       aws eks update-kubeconfig --name ${module.eks_cluster.cluster_name} --region ${var.region}
-      cat <<EOF | kubectl apply -f -
+
+      echo "Applying NodeClass (CRD may need 30-120s to register after cluster ACTIVE)..."
+      APPLIED=false
+      for i in $(seq 1 30); do
+        if cat <<EOF | kubectl apply -f - 2>/dev/null; then
 apiVersion: eks.amazonaws.com/v1
 kind: NodeClass
 metadata:
   name: default
 spec:
-  # DefaultAllow: Allow all traffic by default, NetworkPolicy/ClusterNetworkPolicy can deny specific traffic
-  # This is required for EKS Auto Mode network policy enforcement
   networkPolicy: DefaultAllow
   networkPolicyEventLogs: Enabled
 EOF
+          APPLIED=true
+          echo "NodeClass applied successfully on attempt $i"
+          break
+        fi
+        echo "  Attempt $i/30 - NodeClass CRD not yet serving, retrying in 10s..."
+        sleep 10
+      done
+
+      if [ "$APPLIED" != "true" ]; then
+        echo "FATAL: NodeClass kubectl apply failed after 30 attempts (5 minutes). Is EKS Auto Mode enabled?"
+        exit 1
+      fi
     EOT
   }
 
