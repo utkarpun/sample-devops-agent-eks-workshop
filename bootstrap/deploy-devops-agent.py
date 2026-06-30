@@ -161,7 +161,7 @@ try:
         "Statement": [{
             "Effect": "Allow",
             "Principal": {"Service": "aidevops.amazonaws.com"},
-            "Action": "sts:AssumeRole",
+            "Action": ["sts:AssumeRole", "sts:TagSession"],
             "Condition": {
                 "StringEquals": {"aws:SourceAccount": account_id},
                 "ArnEquals": {"aws:SourceArn": f"arn:aws:aidevops:{REGION}:{account_id}:agentspace/{agent_space_id}"}
