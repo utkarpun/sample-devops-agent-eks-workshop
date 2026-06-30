@@ -214,32 +214,44 @@ try:
         else:
             raise
 
-    # Step 6: EKS access entry for DevOps Agent
+    # Step 6: EKS access entry for DevOps Agent (retry for IAM propagation)
     eks = boto3.client('eks', region_name=REGION)
-    try:
-        retry_transient(lambda: eks.create_access_entry(
-            clusterName='retail-store',
-            principalArn=role_arn,
-            type='STANDARD'
-        ))
-    except ClientError as e:
-        if e.response['Error']['Code'] == 'ResourceInUseException':
-            pass
-        else:
-            raise
+    for attempt in range(1, 6):
+        try:
+            retry_transient(lambda: eks.create_access_entry(
+                clusterName='retail-store',
+                principalArn=role_arn,
+                type='STANDARD'
+            ))
+            break
+        except ClientError as e:
+            code = e.response['Error']['Code']
+            if code == 'ResourceInUseException':
+                break
+            elif code == 'InvalidParameterException' and attempt < 5:
+                print(f'  IAM propagation delay, retry {attempt}/5 in 20s...')
+                time.sleep(20)
+            else:
+                raise
 
-    try:
-        retry_transient(lambda: eks.associate_access_policy(
-            clusterName='retail-store',
-            principalArn=role_arn,
-            policyArn='arn:aws:eks::aws:cluster-access-policy/AmazonAIOpsAssistantPolicy',
-            accessScope={'type': 'cluster'}
-        ))
-    except ClientError as e:
-        if 'already associated' in str(e).lower() or e.response['Error']['Code'] == 'ResourceInUseException':
-            pass
-        else:
-            raise
+    for attempt in range(1, 6):
+        try:
+            retry_transient(lambda: eks.associate_access_policy(
+                clusterName='retail-store',
+                principalArn=role_arn,
+                policyArn='arn:aws:eks::aws:cluster-access-policy/AmazonAIOpsAssistantPolicy',
+                accessScope={'type': 'cluster'}
+            ))
+            break
+        except ClientError as e:
+            code = e.response['Error']['Code']
+            if code == 'ResourceInUseException':
+                break
+            elif code == 'InvalidParameterException' and attempt < 5:
+                print(f'  IAM propagation delay, retry {attempt}/5 in 20s...')
+                time.sleep(20)
+            else:
+                raise
     print("Configured EKS access for DevOps Agent")
 
     # Step 7: Merge devops-agent MCP config into .mcp.json
