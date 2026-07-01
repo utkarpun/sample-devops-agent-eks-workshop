@@ -80,7 +80,7 @@ try:
     repo_dir = os.path.join(PARTICIPANT_HOME, 'sample-devops-agent-eks-workshop')
     if not os.path.exists(repo_dir):
         subprocess.run(
-            ['sudo', '-u', PARTICIPANT_USER, 'git', 'clone', '--branch', 'melbourne-fixes', '--depth', '1',
+            ['sudo', '-u', PARTICIPANT_USER, 'git', 'clone', '--branch', 'main', '--depth', '1',
              'https://github.com/utkarpun/sample-devops-agent-eks-workshop.git', repo_dir],
             check=True
         )
